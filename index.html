@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>divchart</title>
+	<style type="text/css">
+		.divchart{
+			position:relative;
+		}
+
+		.bar{
+			position:absolute;
+			transition: all .2s;
+			-moz-transition: all .2s;
+			-webkit-transition: all .2s;
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+	window.divchart = (function () {
+
+	   function Divchart (dchart) {
+	   		this.dchart = dchart;
+	       	var frag = document.createDocumentFragment(),
+			chart = document.createElement('div');
+			chart.style.height = divchart.height + 'px';
+			chart.style.width = divchart.width + 'px';
+			chart.className = 'divchart';
+
+			if(divchart.center) chart.style.margin = '0 auto';
+			for(var e in this.dchart.bars) chart.appendChild(this.dchart.bars[e]);
+
+			frag.appendChild(chart);
+
+			typeof this.dchart.output != 'undefined' ? document.body.appendChild(frag) : document.getElementById(this.dchart.output).appendChild(fraq);
+			
+
+			return this;
+	   }
+
+	   Divchart.prototype.update = function(data){
+
+	   		var index = 0;
+		   			for(var d in data){
+		   				var currentElement = this.dchart.bars[index];
+		   				currentElement.style.top = (this.dchart.height - data[d].y) + 'px';	
+			   			currentElement.style.height = data[d].y + 'px';	
+			   			
+			   			index++;
+			   		}	
+	   }
+	    
+	   var divchart = {
+
+	   	  width : 800,
+	   	  height: 300,
+	   	  center : true,
+	   	  gap: 5,
+	   	  col : 'black',
+	   	  bars : [],
+
+	   	  util : {
+	   	  	'w' : function(width){
+	   	  		divchart.width = width;
+	   	  	},
+	   	  	'h' : function(height){
+	   	  		divchart.height = height;
+	   	  	},
+	   	  	'output' : function(output){
+	   	  		divchart.output = output;
+	   	  	}
+	   	  },
+
+	      bar: function (data,options,callback, isupdate) {
+
+	      	for(var o in options) divchart.util[o](options[o]);
+	      	
+	      	i = 0;
+	      	max = 0,
+	      	min = Number.MAX_VALUE,
+	      	w = 0.2,
+	      	factor = 0;
+
+	      	for(var d in data){
+				max = d.y > max ? d.y : max;
+				min = d.y < min ? d.y : min;	
+				i++;	
+	      	}
+
+	      	w = ~~((divchart.width - (this.gap * i)) / i);	
+
+	      	factor = 0;
+
+	      	i = 0;
+
+	      	for(var d in data){
+	      		var currentData = data[d];
+	      		var bar = document.createElement('div');
+	      		bar.className= 'bar';
+	      		bar.style.width = w + 'px';
+	      		bar.style.height = currentData.y + 'px';
+	      		bar.style.left = (i * (w + this.gap)) + 'px';
+	      		bar.style.top = (this.height - currentData.y) + 'px';
+	      		bar.style.backgroundColor = this.col;
+
+				this.bars.push(bar);
+				i++;
+	      	}
+	      	if(typeof callback != 'undefined') callback(bars);
+
+	      	return new Divchart(this);
+	      } 
+
+	   };
+	    
+	   return divchart;
+
+	}());
+
+	var num = ~~((Math.random() * 250) + 5),
+	maxh = 300,
+	testdata = [];
+
+	for(var i = 0; i < num; i++) testdata.push({ x : 0, y : (Math.random()*maxh) + 1 });
+
+	var chart = divchart.bar(testdata,{ w : 1000 , h : 300 , output : '#my-chart-yo'});
+	
+	function randomData(){
+		testdata = [];
+
+		for(var i = 0; i < num; i++) testdata.push({ x : 0, y : (Math.random()*maxh) + 1 });
+
+		chart.update(testdata);
+	}
+
+	</script>
+</body>
+</html>
